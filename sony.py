@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Implement part of the Sony Camera Remote API in a scriptable way.
 #
@@ -20,7 +20,7 @@
 # MA  02110-1301, USA.
 
 import cv2
-import urllib2
+from urllib.request import urlopen, Request
 import numpy as np
 import json
 
@@ -31,11 +31,11 @@ class SonyControl:
         self.id = 1
 
     def send_rq(self, data):
-        req = urllib2.Request(self.url)
+        req = Request(self.url)
         req.add_header('Content-Type', 'application/json')
         data["id"] = self.id
         self.id += 1
-        response = urllib2.urlopen(req, json.dumps(data))
+        response = urlopen(req, bytes(json.dumps(data), encoding='utf8'))
         r = json.load(response)
         return r
 
@@ -46,17 +46,17 @@ class SonyControl:
         return self.send_rq(data)
 
     def liveview(self):
-        stream = urllib2.urlopen(self.live)
-        bytes = ''
+        stream = urlopen(self.live)
+        img_bytes = b''
         while True:
-            bytes += stream.read(1024)
-            a = bytes.find('\xff\xd8')
-            b = bytes.find('\xff\xd9')
+            img_bytes += stream.read(1024)
+            a = img_bytes.find(b'\xff\xd8')
+            b = img_bytes.find(b'\xff\xd9')
             if a != -1 and b != -1:
-                jpg = bytes[a:b+2]
-                bytes = bytes[b+2:]
+                jpg = img_bytes[a:b+2]
+                img_bytes = img_bytes[b+2:]
                 i = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8),
-                                 cv2.CV_LOAD_IMAGE_COLOR)
+                                 cv2.IMREAD_COLOR)
                 cv2.imshow('i', i)
                 if cv2.waitKey(1) == 27:
                     exit(0)
