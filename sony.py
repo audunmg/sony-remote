@@ -37,6 +37,9 @@ class SonyControl:
         self.id += 1
         response = urlopen(req, bytes(json.dumps(data), encoding='utf8'))
         r = json.load(response)
+        print(r)
+        if r['error'][0] == 1:
+            r['result'] = [1]
         return r
 
     def send_basic_cmd(self, cmd, params=[]):
@@ -87,6 +90,8 @@ class SonyControl:
         r = self.send_basic_cmd("startLiveview")
         self.live = r["result"][0]
         self.liveview()
+
+
 
 if __name__ == "__main__":
     s = SonyControl()
