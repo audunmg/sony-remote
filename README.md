@@ -15,7 +15,7 @@ The basic set of features that are going to be implemented include:
 * configure various parameters
 
 ## Dependencies
-* Python 2.7
+* Python 3.something
 * python-opencv
 * a compatible Sony camera connected over wifi in the "Smart Remote Control" app
 
